@@ -1,4 +1,4 @@
-> **Decision Mamba from Hierarchical DecisionMamba**\
+> **Decision Mamba from Hierarchical Decision Mamba**\
 > André Correia, Luís A. Alexandre\
 > Paper: 
 
