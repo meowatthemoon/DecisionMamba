@@ -17,8 +17,8 @@ def eval_episodes(env, model : DecisionMamba, target_rew, num_eval_episodes, max
     model.eval()
     model.to(device = device)
 
-    state_mean = torch.from_numpy(state_mean).to(device = device)
-    state_std = torch.from_numpy(state_std).to(device = device)
+    state_mean = torch.from_numpy(state_mean).to(device = device, dtype = torch.float32)
+    state_std = torch.from_numpy(state_std).to(device = device, dtype = torch.float32)
     soa = np.zeros((1, action_size), dtype = np.float32)
 
     episode_returns, episode_lengths = [], []
