@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import random
 
 import d4rl
 import gym
@@ -12,6 +13,13 @@ from dataset import Dataset
 from models.decision_mamba import DecisionMamba
 
 RESULTS_PATH = "./Results/DecisionMamba"
+
+def set_seed_everywhere(seed : int):
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
 
 def eval_episodes(env, model : DecisionMamba, target_rew, num_eval_episodes, max_ep_len, scale, action_range : float, action_size : int, state_size : int, state_mean : float, state_std : float, sequence_length : int,device):
     model.eval()
@@ -68,9 +76,11 @@ def eval_episodes(env, model : DecisionMamba, target_rew, num_eval_episodes, max
         episode_lengths.append(episode_length)
     return episode_returns, episode_lengths
 
-def train(env_name : str, dataset_name : str, batch_size : int, d_model : int, eval_every : int, iterations : int, lr : float, num_eval_episodes : int, n_layer : int, sequence_length : int, weight_decay : float, warmup_steps : int):
-    experiment_name = f'{env_name}_{dataset_name}_E{iterations}_D{d_model}_L{n_layer}_K{sequence_length}'
+def train(seed : int, env_name : str, dataset_name : str, batch_size : int, d_model : int, eval_every : int, iterations : int, lr : float, num_eval_episodes : int, n_layer : int, sequence_length : int, weight_decay : float, warmup_steps : int):
+    experiment_name = f'{env_name}_{dataset_name}_S{seed}_E{iterations}_D{d_model}_L{n_layer}_K{sequence_length}'
     os.makedirs(RESULTS_PATH, exist_ok = True)
+
+    set_seed_everywhere(seed = seed)
 
     dtype = torch.float32
     dataset : Dataset = Dataset(env_name = env_name, dataset = dataset_name, scale = 1000, dtype = dtype)
@@ -155,6 +165,7 @@ def train(env_name : str, dataset_name : str, batch_size : int, d_model : int, e
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type = int)
     parser.add_argument("--env_name", type = str)
     parser.add_argument("--dataset", type = str)
     parser.add_argument("--batch_size", type = int, default = 16)
@@ -170,6 +181,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train(
+        seed = args.seed,
         env_name = args.env_name, 
         dataset_name = args.dataset, 
         batch_size = args.batch_size, 
