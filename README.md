@@ -40,7 +40,7 @@ pip install mamba-ssm
 Train Decision Mamba
 
 ```
-python3 train_decision_mamba.py  --env_name ant --dataset medium-expert --n_layer 6 --d_model 128 --K 20
+python3 train_decision_mamba.py --seed 99 --env_name ant --dataset medium-expert --n_layer 6 --d_model 128 --K 20
 ```
 
 ## Citation
